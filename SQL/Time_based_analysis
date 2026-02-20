@@ -1,0 +1,62 @@
+ 1.TIME-BASED ANALYSIS
+
+## Monthly Revenue
+SELECT 
+    TO_CHAR(close_date,'YYYY-MM') AS month,
+    SUM(close_value) AS revenue
+FROM sales_pipeline_clean
+WHERE deal_stage = 'Won'
+GROUP BY month
+ORDER BY month;
+
+-- Monthly Total Won Deals
+SELECT 
+    TO_CHAR(close_date, 'YYYY-MM') AS month,
+    COUNT(*) AS total_deals
+FROM sales_pipeline_clean
+WHERE deal_stage = 'Won'
+GROUP BY month
+ORDER BY month;
+
+-- Monthly Average Deal Size
+SELECT 
+    TO_CHAR(close_date, 'YYYY-MM') AS month,
+    AVG(close_value) AS avg_deal_size
+FROM sales_pipeline_clean
+WHERE deal_stage = 'Won'
+GROUP BY month
+ORDER BY month;
+
+
+-- 2. DEAL DURATION ANALYSIS
+
+SELECT 
+    deal_stage,
+    AVG(deal_duration) AS avg_duration
+FROM sales_pipeline_clean
+WHERE deal_status IS NOT NULL
+GROUP BY deal_stage;
+
+
+
+ 3. DATA VALIDATION CHECKS
+
+-- Accounts in sales data but missing in accounts table
+SELECT DISTINCT s.account
+FROM sales_pipeline_clean s
+LEFT JOIN accounts a 
+    ON s.account = a.account
+WHERE a.account IS NULL;
+
+
+-- 4. VIEW CREATION (For Reporting)
+
+
+CREATE VIEW monthly_avg_deal_size AS
+SELECT 
+    TO_CHAR(close_date, 'YYYY-MM') AS month,
+    AVG(close_value) AS avg_deal_size
+FROM sales_pipeline_clean
+WHERE deal_stage = 'Won'
+GROUP BY month
+ORDER BY month;
