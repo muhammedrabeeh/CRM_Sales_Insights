@@ -1,1 +1,27 @@
-aa
+import pandas as pd
+
+#Load dataset#
+df = pd.read_excel("crm_sales_data.xlsx", sheet_name="sales_pipeline")
+
+#Standardize deal_stage values#
+df["deal_stage"] = df["deal_stage"].str.strip()
+
+#Create deal_status column#
+df["deal_status"] = df["deal_stage"].map({
+    "Won": 1,
+    "Lost": 0
+})
+
+#Convert date columns#
+df["close_date"] = pd.to_datetime(df["close_date"])
+
+#Remove duplicate opportunity_id if any#
+df = df.drop_duplicates(subset=["opportunity_id"])
+
+#Basic validation checks#
+print("Total rows:", len(df))
+print("Unique opportunities:", df["opportunity_id"].nunique())
+
+#Export cleaned file#
+df.to_csv("sales_pipeline_clean.csv", index=False)
+
