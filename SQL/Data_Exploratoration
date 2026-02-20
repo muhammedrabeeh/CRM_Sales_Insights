@@ -1,0 +1,35 @@
+-- 1. DATA EXPLORATION
+------------------------------------------------------
+
+-- Preview Data
+SELECT * 
+FROM sales_pipeline_clean
+LIMIT 10;
+
+-- Total Records
+SELECT COUNT(*) 
+FROM sales_pipeline_clean;
+
+-- Unique Opportunities
+SELECT COUNT(DISTINCT opportunity_id) 
+FROM sales_pipeline_clean;
+
+-- Product Table Check
+SELECT COUNT(*) FROM product;
+SELECT COUNT(DISTINCT product) FROM product;
+
+-- Accounts Table Check
+SELECT COUNT(account) FROM accounts;
+SELECT COUNT(DISTINCT account) FROM accounts;
+
+
+------------------------------------------------------
+-- 2. DEAL STAGE DISTRIBUTION
+------------------------------------------------------
+
+SELECT 
+    deal_stage, 
+    COUNT(*) AS total_deals
+FROM sales_pipeline_clean
+GROUP BY deal_stage;
+
