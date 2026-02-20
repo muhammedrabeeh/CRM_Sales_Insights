@@ -1,70 +1,49 @@
-# CRM_Sales_Insights
+#Project Overview#
 
-=Project Overview
-This project is an end-to-end CRM Sales Performance Analysis built using Python (Pandas), PostgreSQL, and Power BI.
-The objective was to clean raw sales pipeline data, validate data integrity, perform SQL-based analysis, design a proper star schema model, and develop an interactive executive dashboard in Power BI.
+End-to-end CRM sales analysis project using Python (Pandas), PostgreSQL, and Power BI.
+The goal was to clean raw sales data, validate data integrity, perform SQL analysis, and build an interactive executive dashboard.
 
-=The dashboard provides insights into:
-
-Revenue trends
-Win rate performance
-Deal size analysis
-Sector performance
-Sales agent performance
-Product contribution to revenue
-
-=Tools & Technologies
-
-Python (Pandas) – Data cleaning & preprocessing
+=Tools Used
+Python (Pandas) – Data cleaning
 PostgreSQL – Data storage & SQL analysis
-Power BI – Data modeling & dashboard creation
-Excel – Source dataset
+Power BI – Data modeling & dashboard
+Excel – Source data
 
+ Project Workflow
  
-=Data Cleaning (Python – Pandas)
+=Data Cleaning (Python)
+Standardized deal_stage
+Created deal_status (Won = 1, Lost = 0)
+Handled null values
+Removed duplicates
+Exported clean dataset to PostgreSQL
 
-Loaded and explored CRM sales pipeline dataset
-Standardized deal_stage values
-Created deal_status indicator:
-Handled missing values
-Validated date fields
-Checked for duplicate records
-Exported cleaned dataset to PostgreSQL
+=Data Modeling (PostgreSQL)
 
-=Database Validation & Modeling (PostgreSQL)
-Loaded cleaned data into PostgreSQL
+Verified primary key uniqueness
+Validated foreign key consistency
+Built a Star Schema
+Fact: sales_pipeline_clean
+Dimensions: accounts, product, sales_team
 
-=Verified primary key uniqueness:
-opportunity_id
-account
-product
-sales_agent
+=SQL Analysis
 
-=SQL Exploratory Analysis
-
-Performed analytical queries to understand business performance:
-Monthly revenue analysis
-Monthly deal volume
-Average deal size per month
-Revenue by sector
-Revenue by product
-Sales agent performance
+Monthly revenue trend
 Win rate calculation
-Volume vs deal-size impact on revenue
+Revenue by sector
+Product performance
+Sales agent performance
 
-Key analytical finding:
-Revenue growth was driven more by deal volume than deal size.
+=Power BI Dashboard
 
-=Power BI Data Modeling
-
-Connected Power BI directly to PostgreSQL.
-
--Created DAX Measures:
-Total Revenue (Won Only)
-Total Won Deals
+Connected directly to PostgreSQL
+Created 1:* relationships
+Built DAX measures:
+Total Revenue (Won)
 Win Rate
-Average Deal Size
-Total Closed Deals
+Total Won Deals
+Avg Deal Size
+Designed interactive dashboard with slicers
 
 =Dashboard Overview
 
