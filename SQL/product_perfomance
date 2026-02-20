@@ -1,0 +1,76 @@
+-- 1. PRODUCT PERFORMANCE
+
+## Revenue by Product
+
+SELECT 
+    product, 
+    SUM(close_value) AS total_revenue
+FROM sales_pipeline_clean
+WHERE deal_stage = 'Won'
+GROUP BY product
+ORDER BY total_revenue DESC;
+
+## Win Rate by Product
+SELECT 
+    product, 
+    AVG(deal_status) AS win_rate
+FROM sales_pipeline_clean
+WHERE deal_status IS NOT NULL
+GROUP BY product
+ORDER BY win_rate DESC;
+
+## Combined Product Performance
+
+SELECT 
+    product,
+    SUM(close_value) FILTER (WHERE deal_stage = 'Won') AS total_revenue,
+    AVG(deal_status) AS win_rate
+FROM sales_pipeline_clean
+WHERE deal_status IS NOT NULL
+GROUP BY product
+ORDER BY total_revenue DESC;
+
+## Closed Deals by Product
+SELECT 
+    product,
+    COUNT(*) AS closed_deals
+FROM sales_pipeline_clean
+WHERE deal_status IS NOT NULL
+GROUP BY product
+ORDER BY closed_deals DESC;
+
+-- Average Deal Size by Product
+
+SELECT 
+    product,
+    AVG(close_value) AS avg_deal_size
+FROM sales_pipeline_clean
+WHERE deal_stage = 'Won'
+GROUP BY product
+ORDER BY avg_deal_size DESC;
+
+
+ 2. PRODUCT SERIES PERFORMANCE
+
+## Revenue by Series
+
+SELECT 
+    p.series,
+    SUM(s.close_value) AS revenue 
+FROM sales_pipeline_clean s
+JOIN product p
+    ON p.product = s.product
+GROUP BY p.series
+ORDER BY revenue DESC;
+
+## Win Rate by Series
+
+SELECT 
+    p.series,
+    AVG(s.deal_status) AS win_rate
+FROM sales_pipeline_clean s
+JOIN product p
+    ON p.product = s.product
+WHERE deal_status IS NOT NULL
+GROUP BY p.series
+ORDER BY win_rate DESC;
