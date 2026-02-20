@@ -1,0 +1,49 @@
+1. REVENUE & WIN RATE ANALYSIS
+
+
+-- Total Revenue (Won Deals Only)
+SELECT 
+    SUM(close_value) AS total_revenue
+FROM sales_pipeline_clean
+WHERE deal_stage = 'Won';
+
+-- Win Rate (Won / Closed Deals)
+SELECT 
+    COUNT(CASE WHEN deal_stage = 'Won' THEN 1 END)::float
+    /
+    COUNT(CASE WHEN deal_stage IN ('Won','Lost') THEN 1 END)
+    AS win_rate
+FROM sales_pipeline_clean;
+
+-- Win Rate using deal_status column
+SELECT 
+    AVG(deal_status) AS win_rate
+FROM sales_pipeline_clean
+WHERE deal_status IS NOT NULL;
+
+
+-- 2. SECTOR PERFORMANCE
+
+
+-- Revenue by Sector
+SELECT 
+    a.sector,
+    SUM(s.close_value) AS total_revenue
+FROM sales_pipeline_clean s
+JOIN accounts a 
+    ON s.account = a.account
+WHERE s.deal_stage = 'Won'
+GROUP BY a.sector
+ORDER BY total_revenue DESC;
+
+-- Win Rate by Sector
+SELECT 
+    a.sector,
+    AVG(s.deal_status) AS win_rate
+FROM sales_pipeline_clean s
+JOIN accounts a 
+    ON s.account = a.account
+WHERE s.deal_status IS NOT NULL
+GROUP BY a.sector
+ORDER BY win_rate DESC;
+
