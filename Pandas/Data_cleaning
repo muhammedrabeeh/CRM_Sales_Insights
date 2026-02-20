@@ -1,27 +1,118 @@
+
 import pandas as pd
+from sqlalchemy import create_engine
 
-#Load dataset#
-df = pd.read_excel("crm_sales_data.xlsx", sheet_name="sales_pipeline")
+# 1. LOAD DATA
 
-#Standardize deal_stage values#
-df["deal_stage"] = df["deal_stage"].str.strip()
+sales = pd.read_excel("CRM_SALES.xlsx", sheet_name="SALES PIPELINE")
 
-#Create deal_status column#
-df["deal_status"] = df["deal_stage"].map({
+print("\nDataset Info:")
+print(sales.info())
+
+print("\nMissing Values:")
+print(sales.isnull().sum())
+
+# 2. DATA CLEANING
+
+# Remove extra spaces in deal_stage
+sales["deal_stage"] = sales["deal_stage"].str.strip()
+
+print("\nUnique Deal Stages:")
+print(sales["deal_stage"].unique())
+
+# Convert date columns
+sales["engage_date"] = pd.to_datetime(sales["engage_date"])
+sales["close_date"] = pd.to_datetime(sales["close_date"])
+
+print("\nDeal Stage Distribution:")
+print(sales["deal_stage"].value_counts())
+
+
+# 3. CREATE DEAL STATUS (Won=1, Lost=0)
+
+sales["deal_status"] = sales["deal_stage"].map({
     "Won": 1,
-    "Lost": 0
+    "Lost": 0,
+    "Engaging": None,
+    "Prospecting": None
 })
 
-#Convert date columns#
-df["close_date"] = pd.to_datetime(df["close_date"])
 
-#Remove duplicate opportunity_id if any#
-df = df.drop_duplicates(subset=["opportunity_id"])
+# 4. DEAL DURATION ANALYSIS
 
-#Basic validation checks#
-print("Total rows:", len(df))
-print("Unique opportunities:", df["opportunity_id"].nunique())
+print("\nAverage Deal Duration by Stage:")
+print(sales.groupby("deal_stage")["deal_duration"].mean())
 
-#Export cleaned file#
-df.to_csv("sales_pipeline_clean.csv", index=False)
+
+# 5. KPI CALCULATIONS
+
+# Closed deals only
+closed_deals = sales[sales["deal_status"].notna()]
+
+# Win Rate
+win_rate = closed_deals["deal_status"].mean()
+print("\nWin Rate:", win_rate)
+
+# Total Revenue (Won Deals)
+total_revenue = sales[sales["deal_stage"] == "Won"]["close_value"].sum()
+print("Total Revenue:", total_revenue)
+
+# Average Deal Size
+avg_deal_size = sales[sales["deal_stage"] == "Won"]["close_value"].mean()
+print("Average Deal Size:", avg_deal_size)
+
+# 6. SALES AGENT PERFORMANCE
+
+# Revenue by Sales Agent (Won Deals)
+agent_revenue = (
+    sales[sales["deal_stage"] == "Won"]
+    .groupby("sales_agent")["close_value"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print("\nRevenue by Sales Agent:")
+print(agent_revenue)
+
+
+# Agent Performance (Revenue + Win Rate)
+agent_performance = sales.groupby("sales_agent").agg({
+    "close_value": "sum",
+    "deal_status": "mean"
+})
+
+agent_performance = agent_performance.sort_values(
+    "close_value", ascending=False
+)
+
+print("\nAgent Performance (Revenue & Win Rate):")
+print(agent_performance)
+
+
+# Closed Deals Count per Agent
+deals_count = (
+    closed_deals
+    .groupby("sales_agent")["opportunity_id"]
+    .count()
+    .sort_values(ascending=False)
+)
+
+print("\nClosed Deals Count by Agent:")
+print(deals_count)
+
+# 7. EXPORT CLEAN DATA TO SQL
+
+# Example PostgreSQL connection
+
+engine = create_engine("postgresql://username:password@localhost:5432/your_database")
+
+sales.to_sql(
+    name="sales_pipeline_clean",
+    con=engine,
+    if_exists="replace",
+    index=False
+)
+
+print("\nData successfully exported to SQL as 'sales_pipeline_clean'")
+
 
